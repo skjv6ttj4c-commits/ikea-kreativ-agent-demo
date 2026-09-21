@@ -68,7 +68,7 @@ $('#return-work').onclick=()=>{
  let latest=step>=7?$('#live-feedback'):$('#plan').children[phaseFor(step)].querySelector('.node-current');
  if(latest!==target){if(step<7)$('#plan').children[phaseFor(step)].open=true;const y=latest.getBoundingClientRect().top-panel.getBoundingClientRect().top+panel.scrollTop;panel.scrollTo({top:Math.max(0,y-panel.clientHeight*.35),behavior:'instant'})}
  latest.classList.remove('progress-cue');void latest.offsetWidth;latest.classList.add('progress-cue');
- progressCueTimer=setTimeout(()=>latest.classList.remove('progress-cue'),1250);
+ progressCueTimer=setTimeout(()=>latest.classList.remove('progress-cue'),reduced?1250:3250);
  },reduced?0:350);
  });
 };$('#browse').onclick=()=>{$('#agent').hidden=true;$('#products').hidden=false;toast('可以继续浏览，画布上会保留执行进度')};

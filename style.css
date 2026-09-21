@@ -42,7 +42,7 @@
 #browse{margin:10px 0 20px}
 /* A single, low-contrast sweep links the canvas action to the latest progress. */
 .progress-cue{position:relative;isolation:isolate;border-radius:5px}
-.progress-cue:after{content:'';position:absolute;inset:-4px -6px;pointer-events:none;border-radius:5px;background:linear-gradient(100deg,transparent 25%,rgba(0,88,163,.09) 48%,rgba(0,88,163,.035) 58%,transparent 75%);background-size:250% 100%;animation:progress-sweep 1.1s ease-out 1}
-@keyframes progress-sweep{0%{background-position:140% 0;opacity:0}15%{opacity:1}85%{opacity:1}100%{background-position:-50% 0;opacity:0}}
+.progress-cue:after{content:'';position:absolute;inset:-4px -6px;pointer-events:none;border-radius:5px;background:linear-gradient(100deg,transparent 25%,rgba(0,88,163,.09) 48%,rgba(0,88,163,.035) 58%,transparent 75%);background-size:250% 100%;animation:progress-sweep 1.55s cubic-bezier(.22,.61,.36,1) 2 both}
+@keyframes progress-sweep{0%{background-position:140% 0;opacity:0}12%{opacity:1}62%{opacity:1}78%,100%{background-position:-50% 0;opacity:0}}
 @media(prefers-reduced-motion:reduce){.progress-cue{background:#edf4fa}.progress-cue:after{display:none}}
 #reasons-toggle[aria-pressed=false]{color:#424c56}#reasons-toggle[aria-pressed=true]{background:#e4eff9;color:#0058a3}
