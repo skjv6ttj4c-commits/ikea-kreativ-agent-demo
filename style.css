@@ -47,8 +47,8 @@
 #browse{margin:10px 0 20px}
 /* A low-contrast beam travels out and immediately retraces its path. */
 .progress-cue{position:relative;isolation:isolate;border-radius:5px}
-.progress-cue:after{content:'';position:absolute;inset:-4px -6px;pointer-events:none;border-radius:5px;background:linear-gradient(100deg,transparent 25%,rgba(0,88,163,.09) 48%,rgba(0,88,163,.035) 58%,transparent 75%);background-size:250% 100%;animation:progress-sweep 1.7s cubic-bezier(.45,0,.2,1) 1 both}
-@keyframes progress-sweep{0%{background-position:-55% 0;opacity:0}8%{opacity:1}50%{background-position:140% 0;opacity:1}92%{opacity:1}100%{background-position:-55% 0;opacity:0}}
+.progress-cue:after{content:'';position:absolute;inset:-4px -6px;pointer-events:none;border-radius:5px;background:linear-gradient(100deg,transparent 25%,rgba(0,88,163,.09) 48%,rgba(0,88,163,.035) 58%,transparent 75%);background-size:250% 100%;animation:progress-sweep 2.5s 1 both}
+@keyframes progress-sweep{0%{background-position:140% 0;opacity:0;animation-timing-function:cubic-bezier(.18,.7,.24,1)}7%{opacity:1}38%{background-position:-55% 0;opacity:1}42%{background-position:-55% 0;opacity:.72}48%{background-position:-55% 0;opacity:1;animation-timing-function:cubic-bezier(.55,0,.24,1)}84%{background-position:140% 0;opacity:1}92%{background-position:140% 0;opacity:.42}100%{background-position:140% 0;opacity:0}}
 @media(prefers-reduced-motion:reduce){.progress-cue{background:#edf4fa}.progress-cue:after{display:none}}
 #reasons-toggle[aria-pressed=false]{color:#424c56}#reasons-toggle[aria-pressed=true]{background:#e4eff9;color:#0058a3}
 @media(prefers-reduced-motion:reduce){.builder-home{stroke-dashoffset:0}.builder-block{opacity:1;transform:none}}
