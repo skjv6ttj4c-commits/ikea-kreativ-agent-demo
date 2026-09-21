@@ -7,11 +7,36 @@ const sceneReady=import('./scene.js').then(m=>{room3d=m.createRoom();$('#scene-l
 function configFromBrief(){const text=rows.map(r=>r.text).join('，');const any=/床|收纳|柜|办公|书桌/.test(text);return {bed:!any||(/床/.test(text)&&!/不要.{0,3}床/.test(text)),storage:!any||(/收纳|柜/.test(text)&&!/不要.{0,3}(收纳|柜)/.test(text)),desk:!any||(/办公|书桌/.test(text)&&!/不要.{0,3}(办公|书桌)/.test(text)),single:/单人床/.test(text),corner:/两面靠墙|两侧靠墙|床.{0,4}靠角落|更多活动|太挤|拥挤/.test(text),moreStorage:/更多收纳|增加收纳|高柜/.test(text)}}
 function summary(){const el=$('#brief-summary-list');el.replaceChildren();rows.forEach(r=>{const p=document.createElement('p');p.textContent=groups.find(g=>g[0]===r.type)[1]+' · '+r.text;el.append(p)})}
 function showWork(){ $('#products').hidden=true;$('#agent').hidden=false;$('#conversation').hidden=true;$('#work-panel').hidden=false;$('#work-controls').hidden=false;$('#chips').hidden=true;$('.agent-top>span').textContent='规划与执行 · 02';prompt.placeholder='随时补充，例如：换成单人床…';$('.composer-note').textContent='三维布局演示 · 家具与尺寸为示例';}
-function startWork(){if(!rows.length||rows.some(r=>!r.text.trim())){toast('请填写或删除空白约束');return}if(!room3d){toast('三维房间正在准备，请稍后再试');return}clearTimeout(timer);runConfig=configFromBrief();room3d.configure(runConfig);room3d.stage(0);step=0;running=true;workActive=true;remaining=0;$('#steering-message').hidden=true;summary();showWork();$('#work-panel').scrollTop=0;$('#scene-status').hidden=false;$('.header-actions>span').textContent='金额待核算';updateWork();schedule();}
+function startWork(){if(!rows.length||rows.some(r=>!r.text.trim())){toast('请填写或删除空白约束');return}if(!room3d){toast('三维房间正在准备，请稍后再试');return}clearTimeout(timer);$('#history-list').replaceChildren();$('#work-history').hidden=true;$('#work-history').open=false;$('.brief-summary').open=false;runConfig=configFromBrief();room3d.configure(runConfig);room3d.stage(0);step=0;running=true;workActive=true;remaining=0;$('#steering-message').hidden=true;summary();showWork();$('#work-panel').scrollTop=0;$('#scene-status').hidden=false;$('.header-actions>span').textContent='金额待核算';updateWork();schedule();}
 function finding(){const c=runConfig;return [ '正在为休息、收纳与办公安排位置，先看布局，再看细节。',c.bed?(c.corner?'床头和一侧临墙，中央区域更完整；会保留另一侧上下床的空间。':'床头靠墙，朝向房间的一侧留作上下床的通道。'):'本轮没有床的需求，跳过休息区。',c.storage?'收纳沿墙集中布置，避免将柜体散放在房间中间。':'本轮没有收纳需求，跳过柜体布置。',c.desk?'书桌安排在窗边，利用自然光，并与休息区域分开。':'本轮没有办公需求，跳过书桌布置。','占位布局已确定，正在补上床垫、柜门和桌椅等示例细节。','布局草案已经可以查看。正在整理家具比例与设计说明。','正在核对这份示例草案中的家具位置；商品价格与真实开合条件暂未接入。','第一轮草案已就绪。可以回看设计原因，再决定下一步怎么调整。'][step]}
-function updateWork(){const done=step>=7,phase=phaseFor(step);$('#work-title').textContent=done?'空间草案已就绪':!running?'已暂停，草案为你保留':'正在'+stageNames[phase];$('#work-subtitle').textContent=done?'先看看这个方向是否适合你。':!running?'你可以继续查看，准备好后再继续。':step<4?'先摆好位置，不急着决定每件家具。':step<6?'布局已经成形，正在补充家具细节。':'最后核对一次，保留需要后续确认的事项。';const plan=$('#plan');plan.replaceChildren();stageNames.forEach((name,i)=>{const row=document.createElement('div');row.className='plan-step '+(done||i<phase?'done':i===phase?'current':'');const dot=document.createElement('span');dot.className='step-dot';dot.textContent=done||i<phase?'✓':i+1;const body=document.createElement('div');const b=document.createElement('b');b.textContent=name;const p=document.createElement('p');p.textContent=done||i<phase?'已完成':i===phase?(!running?'已暂停':['依次安排床、收纳和办公区','将占位替换为示例家具','核对位置与待确认事项'][i]):'待开始';body.append(b,p);row.append(dot,body);plan.append(row)});$('#finding-text').textContent=finding();const needs=$('#needs-status');needs.replaceChildren();[['bed','休息区',1],['storage','收纳',2],['desk','办公区',3]].forEach(([key,name,min])=>{if(!runConfig[key])return;const p=document.createElement('p');const a=document.createElement('span');a.textContent=name;const b=document.createElement('span');b.textContent=step>=4?'已放入示例家具':step>=min?'已安排位置':'待安排';p.append(a,b);needs.append(p)});const budget=document.createElement('p');budget.textContent='预算与实际开合 · 待商品数据核验';budget.className='unverified';needs.append(budget);$('#pause').textContent=running?'Ⅱ 暂停':'▶ 继续执行';$('#pause').hidden=done;$('#slow-message').hidden=step<4||done;$('#work-complete').hidden=!done;$('#scene-status-text').textContent=done?'草案已就绪':running?'正在'+stageNames[phase]:'已暂停 · 草案已保留';$('#scene-status').classList.toggle('paused',!running);$('.canvas-label>span').textContent=done?'空间草案':step<4?'布局草案':'家具草案';$('#next-step').disabled=done;}
+function feedbackTitle(){return ['正在安排空间',runConfig.bed?'休息区位置已确定':'已跳过休息区',runConfig.storage?'收纳位置已确定':'已跳过收纳区',runConfig.desk?'办公区位置已确定':'空间布局已确定','布局已确定，正在搭配家具','草案已可查看，正在整理细节','正在检查空间草案','第一轮空间草案已就绪'][step]}
+function rememberNode(){
+ if(step<1||step>6)return;
+ const li=document.createElement('li');const title=document.createElement('b');title.textContent=feedbackTitle();const body=document.createElement('p');body.textContent=finding();li.append(title,body);$('#history-list').append(li);$('#work-history').hidden=false;$('#history-count').textContent=$('#history-list').children.length+' 条';
+}
+function updateWork(){
+ const done=step>=7,phase=phaseFor(step),paused=!running&&!done;
+ $('#work-title').textContent=paused?'已暂停，草案为你保留':feedbackTitle();
+ $('#feedback-state').textContent=done?'本轮已完成':paused?'已暂停':step>=1&&step<=3?'阶段进展':'正在执行';
+ $('#live-feedback').dataset.state=done?'complete':paused?'paused':'running';
+ $('#finding-text').textContent=done?'可以旋转查看空间，也可以点击家具上的圆点，回看每个布局决定的原因。':finding();
+ const next=['接下来：依次安排家具的位置。','接下来：安排收纳位置。','接下来：安排办公区。','接下来：为布局补充家具细节。','你可以先旋转房间，看看这个布局是否适合你。','正在整理比例和设计说明，已有草案会保留在画布中。','完成后会在这里更新结果。','觉得哪里不合适？可以在下方补充想法。'];
+ $('#feedback-next').textContent=paused?'当前内容已保留，你可以继续查看，或在下方继续执行。':next[step];
+ $('#completion-note').hidden=!done;
+ $('#browse').hidden=!running||step<4||step>=7;
+ const plan=$('#plan');plan.replaceChildren();stageNames.forEach((name,i)=>{
+ const el=document.createElement('div');el.className='plan-step '+(done||i<phase?'done':i===phase?'current':'');
+ if(!done&&i===phase)el.setAttribute('aria-current','step');
+ el.setAttribute('aria-label',name+'：'+(done||i<phase?'已完成':i===phase?(paused?'已暂停':'进行中'):'待开始'));
+ const dot=document.createElement('span');dot.className='step-dot';dot.textContent=done||i<phase?'✓':i+1;
+ const label=document.createElement('b');label.textContent=name;el.append(dot,label);plan.append(el);
+ });
+ $('#pause').textContent=running?'Ⅱ 暂停':'▶ 继续执行';$('#pause').hidden=done;
+ $('#scene-status-text').textContent=done?'草案已就绪':running?'正在'+stageNames[phase]:'已暂停 · 草案已保留';
+ $('#scene-status').classList.toggle('paused',!running);$('.canvas-label>span').textContent=done?'空间草案':step<4?'布局草案':'家具草案';$('#next-step').disabled=done;
+}
 function schedule(){clearTimeout(timer);if(!running||step>=7)return;const ms=remaining||durations[step]*($('#slow-mode').checked?2.5:1);remaining=0;due=Date.now()+ms;timer=setTimeout(advance,ms)}
-function advance(){clearTimeout(timer);if(step>=7)return;step++;room3d.stage(Math.min(step,4));remaining=0;if(step>=7){running=false;toast('空间草案已就绪，可以查看了');}updateWork();schedule()}
+function advance(){clearTimeout(timer);if(step>=7)return;rememberNode();step++;room3d.stage(Math.min(step,4));remaining=0;if(step>=7){running=false;toast('空间草案已就绪，可以查看了');}updateWork();schedule()}
 function pause(){if(!running)return;remaining=Math.max(100,due-Date.now());clearTimeout(timer);running=false;updateWork()}
 $('#start').onclick=startWork;$('#pause').onclick=()=>{if(running)pause();else{running=true;updateWork();schedule()}};
 $('#next-step').onclick=()=>{advance()};$('#slow-mode').onchange=()=>{remaining=0;schedule()};$('#replay').onclick=startWork;
