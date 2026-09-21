@@ -55,8 +55,8 @@ function advance(){clearTimeout(timer);if(step>=7)return;step++;room3d.stage(ste
 function pause(){if(!running)return;remaining=Math.max(100,due-Date.now());clearTimeout(timer);running=false;updateWork()}
 $('#start').onclick=startWork;$('#pause').onclick=()=>{if(running)pause();else{running=true;updateWork();schedule()}};
 
-function editBrief(){pause();dissatisfactionActive=false;setSpatialFeedbackMode(false);$('#work-panel').hidden=true;$('#work-controls').hidden=true;$('#conversation').hidden=false;$('#brief').hidden=false;$('#welcome').hidden=true;$('#chips').hidden=false;$('#pause-suggestions').hidden=true;$('.agent-top>span').textContent='需求设定 · 01';$('#handoff').hidden=true;$('#start').hidden=false;$('#start').innerHTML='按新需求重新设计 <span>→</span>';prompt.placeholder='补充或修改你的需求…';workActive=false;render();$('#conversation').scrollTop=0;}
-$('#edit-brief').onclick=editBrief;$('#edit-work').onclick=editBrief;
+function editBrief(){pause();dissatisfactionActive=false;setSpatialFeedbackMode(false);$('#scene-status').hidden=true;$('#work-panel').hidden=true;$('#work-controls').hidden=true;$('#conversation').hidden=false;$('#brief').hidden=false;$('#welcome').hidden=true;$('#chips').hidden=false;$('#pause-suggestions').hidden=true;$('.agent-top>span').textContent='重新梳理需求 · 01';$('#handoff').hidden=true;$('#start').hidden=false;$('#start').innerHTML='按新需求重新设计 <span>→</span>';prompt.placeholder='补充或修改你的需求…';workActive=false;render();$('#conversation').scrollTop=0;}
+$('#edit-brief').onclick=editBrief;
 const originalEnter=$('#enter').onclick;$('#enter').onclick=()=>{if(workActive)showWork();else originalEnter()};let progressCueTimer=null,progressFocusTimer=null;
 $('#return-work').onclick=()=>{
  if(!workActive){$('#enter').click();return}
