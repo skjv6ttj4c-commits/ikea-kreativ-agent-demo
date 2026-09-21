@@ -30,8 +30,12 @@ function updatePlan(){
  const list=d.querySelector('.node-log');const entries=past[i].filter(Boolean);
  // Keep existing history nodes stable while users read them.
  if(list.children.length!==entries.length){list.replaceChildren();entries.forEach(([title,text])=>{const li=document.createElement('li');const b=document.createElement('b');b.textContent=title;const p=document.createElement('p');p.textContent=text;li.append(b,p);list.append(li)})}
- const current=d.querySelector('.node-current');current.hidden=complete;
- current.textContent=active?(running?actions[step]:'已暂停 · '+actions[step].replace('正在','待继续')):'此阶段尚未开始。';
+ const current=d.querySelector('.node-current');current.hidden=complete;current.classList.toggle('is-running',active&&running);
+ current.replaceChildren();
+ if(active&&running){
+ const loader=document.createElement('span');loader.className='kreativ-builder';loader.setAttribute('aria-hidden','true');loader.innerHTML='<svg viewBox="0 0 32 32"><path class="builder-home" d="M4.5 13 16 4.5 27.5 13v14.5h-23V23"/><path class="builder-wall" d="M4.5 17v2.5M4.5 21.5V24"/><g class="builder-pencil"><path d="m9 22 2.2-5.2 9.7-7.2 3.2 4.3-9.7 7.2L9 22Z"/><path d="m20.9 9.6 3.2 4.3"/></g><rect class="builder-block" x="4.5" y="25" width="5" height="2.5" rx=".8"/></svg>';
+ const label=document.createElement('span');label.textContent=actions[step];current.append(loader,label);
+ }else current.textContent=active?'已暂停 · '+actions[step].replace('正在','待继续'):'此阶段尚未开始。';
  });
  previousPhase=phase;
 }
