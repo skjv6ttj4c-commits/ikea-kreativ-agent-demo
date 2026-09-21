@@ -43,7 +43,7 @@ function updateWork(){
  $('#scene-status').classList.toggle('paused',!running);$('.canvas-label>span').textContent=done?'空间草案':step<4?'布局草案':'家具草案';
 }
 function schedule(){clearTimeout(timer);if(!running||step>=7)return;const ms=remaining||durations[step];remaining=0;due=Date.now()+ms;timer=setTimeout(advance,ms)}
-function advance(){clearTimeout(timer);if(step>=7)return;step++;room3d.stage(Math.min(step,4));remaining=0;if(step>=7){running=false;toast('空间草案已就绪，可以查看了');}updateWork();schedule()}
+function advance(){clearTimeout(timer);if(step>=7)return;step++;room3d.stage(step);remaining=0;if(step>=7){running=false;toast('空间草案已就绪，可以查看了');}updateWork();schedule()}
 function pause(){if(!running)return;remaining=Math.max(100,due-Date.now());clearTimeout(timer);running=false;updateWork()}
 $('#start').onclick=startWork;$('#pause').onclick=()=>{if(running)pause();else{running=true;updateWork();schedule()}};
 
