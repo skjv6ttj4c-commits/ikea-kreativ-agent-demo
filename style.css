@@ -29,3 +29,14 @@
 #history-list li{margin:0 0 20px}#history-list b{font-size:13px;font-weight:500;color:#687582}#history-list p{font-size:12px;line-height:1.85;margin:7px 0 0;color:#8c959e}
 #work-panel>.demo-options{margin-top:auto;padding-top:20px;padding-bottom:4px;flex-shrink:0}.demo-options button{display:block}
 @media(max-width:600px){#work-title{font-size:21px}#finding-text{font-size:14px}#plan{margin:20px 0}#live-feedback{min-height:210px}}
+/* Vertical task hierarchy: live actions live inside their parent phase. */
+#plan{display:block;margin:24px 0 8px}
+.task-node{border-bottom:1px solid #e8edf1;padding:0;margin:0 0 14px}
+.task-node summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;padding:8px 0 19px}
+.task-node summary::-webkit-details-marker{display:none}
+.node-icon{display:grid;place-items:center;flex:0 0 25px;height:25px;border-radius:50%;background:#f0f3f6;color:#8794a0;font-size:12px}
+.task-node summary>b{font-size:15px;font-weight:600}.node-status{margin-left:auto;font-size:12px;color:#8a949e}.node-chevron{font-size:17px;color:#8a949e;transition:transform .15s}.task-node[open] .node-chevron{transform:rotate(180deg)}
+.task-node[data-state=current] .node-icon{color:white;background:#0058a3}.task-node[data-state=current] summary>b,.task-node[data-state=current] .node-status{color:#0058a3}.task-node[data-state=done] .node-icon{color:#0058a3;background:#eaf2f8}.task-node[data-state=pending] summary>b{color:#939da6}
+.node-body{margin:0 0 21px 12px;padding:0 0 0 23px;border-left:1px solid #dce5ee}.node-log{list-style:none;padding:0;margin:0}.node-log li{padding:0 0 17px}.node-log b{font-size:13px;font-weight:500;color:#566675}.node-log b:before{content:'✓';color:#698195;margin-right:7px}.node-log p{font-size:12px;line-height:1.9;color:#8b959e;margin:5px 0 0}.node-current{font-size:14px;line-height:1.9;margin:0;color:#0058a3}.node-current:before{content:'·';margin-right:7px;font-weight:bold}
+#live-feedback{min-height:0;padding:15px 0 10px}#live-feedback h1{font-size:20px;line-height:1.5;margin-bottom:12px}#live-feedback>p{font-size:14px;color:#63717e;line-height:1.9}#live-feedback #completion-note{font-size:12px}
+#browse{margin:10px 0 20px}
