@@ -125,3 +125,4 @@
 #demo-return button{padding:6px 9px;border:1px solid #abc7da;border-radius:15px;background:#fff;color:#0058a3;font-size:10px;font-weight:650}
 @media(max-width:600px){#demo-return{top:-15px;margin:-15px -20px 12px;padding:9px 20px}.header-actions .scenario-button{padding:8px 10px;font-size:11px}}
 @media(max-width:600px){#spatial-feedback-toggle{padding:12px;font-size:12px}}
+#welcome{width:100%}#welcome h1,#welcome>p{white-space:nowrap}
