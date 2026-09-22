@@ -101,3 +101,16 @@
 .chat-result>b{font-size:13px;color:#35634e}
 .chat-result ul{margin:9px 0 0;padding-left:18px;color:#52636b;font-size:12px;line-height:1.8}
 .chat-result p{margin:8px 0 0;color:#7a878d;font-size:11px;line-height:1.7}
+
+/* Recoverable service issue: reassure first, then offer two low-cost choices. */
+.task-node[data-state=service-error] summary .node-icon{background:#fff3cd;color:#8a5a00}
+.task-node[data-state=service-error] summary>b,.task-node[data-state=service-error] .node-status{color:#76520c}
+.service-failure{border-color:#e6dfcb;background:#fffefa}
+.service-failure>span{background:#f7edca;color:#71571e}
+.service-failure details{margin:0 0 12px;color:#7f878d;font-size:10px}
+.service-failure details summary{cursor:pointer;color:#667784}
+.service-failure details p{margin:7px 0 0;padding:8px 9px;border-radius:7px;background:#f5f7f8;line-height:1.65}
+.service-failure>div{grid-template-columns:1.35fr 1fr}
+.service-failure button:first-child{border-color:#a9c5da;background:#edf5fa}
+.service-failure button:first-child b{color:#0058a3}
+.service-failure.retrying{border-color:#dce7ef;background:#f8fbfd}
