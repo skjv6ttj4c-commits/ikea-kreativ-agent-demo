@@ -126,3 +126,7 @@
 @media(max-width:600px){#demo-return{top:-15px;margin:-15px -20px 12px;padding:9px 20px}.header-actions .scenario-button{padding:8px 10px;font-size:11px}}
 @media(max-width:600px){#spatial-feedback-toggle{padding:12px;font-size:12px}}
 #welcome{width:100%}#welcome h1,#welcome>p{white-space:nowrap}
+.agent-header{display:flex;align-items:center;justify-content:space-between;min-height:76px;padding:14px 24px;border-bottom:1px solid var(--line)}.agent-header .agent-title{padding:0;border:0}.agent-header #back{padding:8px 0 8px 12px;color:#59636c;font-size:12px;white-space:nowrap}.agent-header #back:hover{color:#0058a3}
+#prompt:focus,#prompt:focus-visible,#spatial-feedback-text:focus,#spatial-feedback-text:focus-visible{outline:none!important;outline-offset:0!important}#input-form:focus-within,#spatial-feedback-form:focus-within{border-color:#9ca6ae;box-shadow:none}
+#work-chat>#process-group{margin:8px 0 4px}#work-chat>.chat-agent+#process-group{margin-top:2px}
+@media(max-width:600px){.agent-header{min-height:66px;padding:10px 20px}.agent-header #back{font-size:11px}.agent-header .agent-symbol{width:34px;height:34px}.agent-header .agent-title b{font-size:14px}}
