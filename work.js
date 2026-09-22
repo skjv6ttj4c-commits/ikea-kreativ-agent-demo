@@ -1,14 +1,14 @@
 // State 2 uses a deterministic local scenario; progress follows actual scene updates.
-let room3d=null,sceneModule=null,workActive=false,running=false,step=-1,timer=null,due=0,remaining=0,runConfig=null,steeringEvents=[],steeringSerial=0,designVersions=[],compareRooms=null,compareSyncing=false,activeVersion=1,feedbackSelection=null,localFeedbackTags=new Set(),dissatisfactionActive=false;
+let room3d=null,sceneModule=null,workActive=false,running=false,step=-1,timer=null,due=0,remaining=0,runConfig=null,steeringEvents=[],steeringSerial=0,designVersions=[],compareRooms=null,compareSyncing=false,activeVersion=1,feedbackSelection=null,localFeedbackTags=new Set(),dissatisfactionActive=false,briefEditSession=null;
 const stageNames=['安排空间','搭配家具','检查草案'];
 const phaseFor=s=>s<4?0:s<6?1:2;
 const durations=[4500,6500,6500,6500,6500,7500,6000];
 const sceneReady=import('./scene.js?v=17').then(m=>{sceneModule=m;room3d=m.createRoom();$('#scene-loading')?.remove();return room3d}).catch(err=>{$('#scene-error').hidden=false;$('#scene-loading')?.remove();$('#start').disabled=true;$('#start').textContent='三维场景不可用';console.error(err);return null});
 function configFromBrief(){const text=rows.map(r=>r.text).join('，');const any=/床|收纳|柜|办公|书桌/.test(text);return {bed:!any||(/床/.test(text)&&!/不要.{0,3}床/.test(text)),storage:!any||(/收纳|柜/.test(text)&&!/不要.{0,3}(收纳|柜)/.test(text)),desk:!any||(/办公|书桌/.test(text)&&!/不要.{0,3}(办公|书桌)/.test(text)),single:/单人床/.test(text),corner:/两面靠墙|两侧靠墙|床.{0,4}靠角落|更多活动|太挤|拥挤/.test(text),moreStorage:/更多收纳|增加收纳|高柜/.test(text)}}
-function summary(){const el=$('#brief-summary-list');el.replaceChildren();rows.forEach(r=>{const p=document.createElement('p');p.textContent=groups.find(g=>g[0]===r.type)[1]+' · '+r.text;el.append(p)})}
+function summary(){const el=$('#brief-summary-list');el.replaceChildren();rows.forEach(r=>{const type=r.type==='lock'?'must':r.type;const p=document.createElement('p');p.textContent=(groups.find(g=>g[0]===type)||groups[0])[1]+' · '+r.text;el.append(p)})}
 function syncWorkComposer(){const paused=workActive&&!running&&step<7;$('#pause-suggestions').hidden=!paused;prompt.placeholder=paused?'您暂停了当前方案，随时告诉我如何调整，直接说就好':'随时补充，例如：换成单人床…';$('.input-foot span').textContent=paused?'可以修改建议后再发送':'也可以只说一句话'}
 function showWork(){ $('#products').hidden=true;$('#agent').hidden=false;$('#conversation').hidden=true;$('#work-panel').hidden=false;$('#work-controls').hidden=false;$('#chips').hidden=true;$('.agent-top>span').textContent='规划与执行 · 02';$('.composer-note').textContent='三维布局演示 · 家具与尺寸为示例';syncWorkComposer();}
-function startWork(){if(!rows.length||rows.some(r=>!r.text.trim())){toast('请填写或删除空白约束');return}if(!room3d){toast('三维房间正在准备，请稍后再试');return}dissatisfactionActive=false;setSpatialFeedbackMode(false);clearTimeout(timer);previousPhase=-1;steeringEvents=[];designVersions=[];activeVersion=1;$('#version-controls').hidden=true;$('#compare-layer').hidden=true;$('#plan').replaceChildren();$('.brief-summary').open=false;runConfig=configFromBrief();room3d.configure(runConfig);room3d.stage(0);step=0;running=true;workActive=true;remaining=0;$('#steering-message').hidden=true;summary();showWork();$('#work-panel').scrollTop=0;$('#scene-status').hidden=false;$('.header-actions>span').textContent='金额待核算';updateWork();schedule();}
+function startWork(){if(!rows.length||rows.some(r=>!r.text.trim())){toast('请填写或删除空白约束');return}if(!room3d){toast('三维房间正在准备，请稍后再试');return}briefEditSession=null;setBriefEditing(false);dissatisfactionActive=false;setSpatialFeedbackMode(false);clearTimeout(timer);previousPhase=-1;steeringEvents=[];designVersions=[];activeVersion=1;$('#version-controls').hidden=true;$('#compare-layer').hidden=true;$('#plan').replaceChildren();$('#process-group').open=true;$('#process-status').textContent='进行中';$('.brief-summary').open=false;runConfig=configFromBrief();room3d.configure(runConfig);room3d.stage(0);step=0;running=true;workActive=true;remaining=0;$('#steering-message').hidden=true;summary();showWork();$('#work-panel').scrollTop=0;$('#scene-status').hidden=false;$('.header-actions>span').textContent='金额待核算';updateWork();schedule();}
 let previousPhase=-1;
 function updatePlan(){
  const done=step>=7,phase=done?3:phaseFor(step),changed=phase!==previousPhase;
@@ -45,7 +45,7 @@ function updatePlan(){
 }
 function updateWork(){
  const done=step>=7,phase=phaseFor(step),adjusting=steeringEvents.some(e=>e.phase===phase&&e.state==='active');
- updatePlan();$('#live-feedback').hidden=!done;$('#browse').hidden=!running||step<4||done;
+ updatePlan();const process=$('#process-group');if(done){process.open=false;$('#process-status').textContent='已完成';[...$('#plan').children].forEach(node=>node.open=false)}else{process.open=true;$('#process-status').textContent=running?'进行中':'已暂停'}$('#live-feedback').hidden=!done;$('#browse').hidden=!running||step<4||done;
  $('#pause').textContent=running?'Ⅱ 暂停':'▶ 继续执行';$('#pause').hidden=done;
  $('#scene-status-text').textContent=done?'草案已就绪':running?(adjusting?'正在按新方向调整':'正在'+stageNames[phase]):'已暂停 · 草案已保留';
  $('#scene-status').classList.toggle('paused',!running);$('.canvas-label>span').textContent=done?'空间草案':step<4?'布局草案':'家具草案';syncWorkComposer();
@@ -55,8 +55,9 @@ function advance(){clearTimeout(timer);if(step>=7)return;step++;room3d.stage(ste
 function pause(){if(!running)return;remaining=Math.max(100,due-Date.now());clearTimeout(timer);running=false;updateWork()}
 $('#start').onclick=startWork;$('#pause').onclick=()=>{if(running)pause();else{running=true;updateWork();schedule()}};
 
-function editBrief(){pause();dissatisfactionActive=false;setSpatialFeedbackMode(false);$('#scene-status').hidden=true;$('#work-panel').hidden=true;$('#work-controls').hidden=true;$('#conversation').hidden=false;$('#brief').hidden=false;$('#welcome').hidden=true;$('#chips').hidden=false;$('#pause-suggestions').hidden=true;$('.agent-top>span').textContent='重新梳理需求 · 01';$('#handoff').hidden=true;$('#start').hidden=false;$('#start').innerHTML='按新需求重新设计 <span>→</span>';prompt.placeholder='补充或修改你的需求…';workActive=false;render();$('#conversation').scrollTop=0;}
-$('#edit-brief').onclick=editBrief;
+function editBrief(){const wasRunning=running;if(wasRunning)pause();rows=rows.map(r=>r.type==='lock'?{...r,type:'must'}:r);briefEditSession={rows:rows.map(r=>({...r})),serial,wasRunning,remaining,step};dissatisfactionActive=false;setSpatialFeedbackMode(false);$('#scene-status').hidden=true;$('#work-panel').hidden=true;$('#work-controls').hidden=true;$('#conversation').hidden=false;$('#brief').hidden=false;$('#welcome').hidden=true;$('#chips').hidden=false;$('#pause-suggestions').hidden=true;$('.agent-top>span').textContent='重新梳理需求 · 01';$('#handoff').hidden=true;$('#start').hidden=false;$('#start').innerHTML='按新需求重新设计 <span>→</span>';prompt.placeholder='补充或修改你的需求…';workActive=false;setBriefEditing(true);render();invalidate();$('#conversation').scrollTop=0;}
+function cancelBriefEdit(){if(!briefEditSession)return;rows=briefEditSession.rows.map(r=>({...r}));serial=briefEditSession.serial;remaining=briefEditSession.remaining;step=briefEditSession.step;const resume=briefEditSession.wasRunning&&step<7;briefEditSession=null;setBriefEditing(false);render();summary();workActive=true;$('#conversation').hidden=true;showWork();previousPhase=-1;running=resume;updateWork();$('#scene-status').hidden=false;if(running)schedule();$('#work-panel').scrollTop=0;}
+$('#edit-brief').onclick=editBrief;$('#brief-cancel').onclick=cancelBriefEdit;
 const originalEnter=$('#enter').onclick;$('#enter').onclick=()=>{if(workActive)showWork();else originalEnter()};let progressCueTimer=null,progressFocusTimer=null;
 $('#return-work').onclick=()=>{
  if(!workActive){$('#enter').click();return}
@@ -91,7 +92,7 @@ function steeringPlan(text,currentPhase){
 function applySteering(text){
  const snapshot={rows:rows.map(r=>({...r})),config:{...runConfig},step,running};const oldPhase=phaseFor(step),plan=steeringPlan(text,oldPhase);clearTimeout(timer);
  steeringEvents.forEach(e=>{if(e.state==='active')e.state='done'});
- if(/单人床|双人床/.test(text))rows=rows.filter(r=>r.type==='lock'||!/床/.test(r.text));
+ if(/单人床|双人床/.test(text))rows=rows.filter(r=>!/床/.test(r.text));
  if(/预算/.test(text))rows=rows.filter(r=>!/预算/.test(r.text));
  if(/不要.{0,4}(办公区|书桌)/.test(text))rows=rows.filter(r=>!/办公|书桌/.test(r.text));
  parse(text);render();summary();runConfig=configFromBrief();room3d.configure(runConfig);
