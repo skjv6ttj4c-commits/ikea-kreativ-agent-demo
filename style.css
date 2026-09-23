@@ -106,6 +106,7 @@
 .chat-result>b{font-size:13px;color:#35634e}
 .chat-result ul{margin:9px 0 0;padding-left:18px;color:#52636b;font-size:12px;line-height:1.8}
 .chat-result p{margin:8px 0 0;color:#7a878d;font-size:11px;line-height:1.7}
+.chat-result.initial-result{min-height:0;margin:0;padding:13px 14px;border:1px solid #dfe9e3;border-radius:12px;background:#f8fbf9}.chat-result.initial-result h1{margin:0;color:#35634e;font-size:13px;line-height:1.5}.chat-result.initial-result>p{margin:8px 0 0;color:#64766d;font-size:11px;line-height:1.7}.chat-result.initial-result #completion-note{display:none}.loading-reply[hidden]{display:none}
 
 /* Recoverable service issue: reassure first, then offer two low-cost choices. */
 .task-node[data-state=service-error] summary .node-icon{background:#fff3cd;color:#8a5a00}
