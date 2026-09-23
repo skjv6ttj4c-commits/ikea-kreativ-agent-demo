@@ -99,12 +99,29 @@ function editBrief(){const wasRunning=running;if(wasRunning)pause();rows=rows.ma
 function cancelBriefEdit(){if(!briefEditSession)return;rows=briefEditSession.rows.map(r=>({...r}));serial=briefEditSession.serial;remaining=briefEditSession.remaining;step=briefEditSession.step;const resume=briefEditSession.wasRunning&&step<7;briefEditSession=null;setBriefEditing(false);render();summary();workActive=true;$('#conversation').hidden=true;showWork();previousPhase=-1;running=resume;updateWork();$('#scene-status').hidden=false;if(running)schedule();$('#work-panel').scrollTop=0;}
 $('#edit-brief').onclick=editBrief;$('#brief-cancel').onclick=cancelBriefEdit;
 const originalEnter=$('#enter').onclick;$('#enter').onclick=()=>{if(workActive)showWork();else originalEnter()};let progressCueTimer=null,progressFocusTimer=null;
+function latestProgressTarget(){
+ // Corrections create newer task entries in the conversation. Prefer the
+ // current entry (or its latest result) over the original three-node process.
+ if(frozenProcess||dissatisfactionActive||budgetConflictState==='shown'){
+  if(currentChatTask?.isConnected&&!currentChatTask.hidden&&currentChatTask.dataset.state!=='done'){
+   currentChatTask.open=true;
+   return currentChatTask.querySelector('.chat-task-body p')||currentChatTask;
+  }
+  const latest=[...$('#work-chat').children].reverse().find(item=>!item.hidden&&item.id!=='process-group');
+  if(latest){
+   if(latest.matches('details'))latest.open=true;
+   return latest.matches('.chat-task')?(latest.querySelector('.chat-task-body p')||latest):latest;
+  }
+ }
+ if(step>=7)return $('#live-feedback');
+ const node=$('#plan').children[phaseFor(step)];
+ node.open=true;
+ return node.querySelector('.node-current')||node;
+}
 $('#return-work').onclick=()=>{
  if(!workActive){$('#enter').click();return}
  showWork();
- let target;
- if(step>=7){target=$('#live-feedback')}
- else{const node=$('#plan').children[phaseFor(step)];node.open=true;target=node.querySelector('.node-current')}
+ let target=latestProgressTarget();
  clearTimeout(progressCueTimer);clearTimeout(progressFocusTimer);
  document.querySelectorAll('.progress-cue').forEach(el=>el.classList.remove('progress-cue'));
  const panel=$('#work-panel'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -113,11 +130,11 @@ $('#return-work').onclick=()=>{
  panel.scrollTo({top:Math.max(0,offset-panel.clientHeight*.35),behavior:reduced?'instant':'smooth'});
  progressFocusTimer=setTimeout(()=>{
  if(!workActive||$('#agent').hidden)return;
- // Progress may advance during scrolling: cue the newest action, never an obsolete one.
- let latest=step>=7?$('#live-feedback'):$('#plan').children[phaseFor(step)].querySelector('.node-current');
- if(latest!==target){if(step<7)$('#plan').children[phaseFor(step)].open=true;const y=latest.getBoundingClientRect().top-panel.getBoundingClientRect().top+panel.scrollTop;panel.scrollTo({top:Math.max(0,y-panel.clientHeight*.35),behavior:'instant'})}
+ // Resolve again after scrolling so a just-advanced task is highlighted.
+ let latest=latestProgressTarget();
+ if(latest!==target){const y=latest.getBoundingClientRect().top-panel.getBoundingClientRect().top+panel.scrollTop;panel.scrollTo({top:Math.max(0,y-panel.clientHeight*.35),behavior:'instant'})}
  latest.classList.remove('progress-cue');void latest.offsetWidth;latest.classList.add('progress-cue');
- progressCueTimer=setTimeout(()=>latest.classList.remove('progress-cue'),reduced?1250:3250);
+ progressCueTimer=setTimeout(()=>latest.classList.remove('progress-cue'),reduced?1250:4200);
  },reduced?0:350);
  });
 };$('#browse').onclick=()=>{$('#agent').hidden=true;$('#products').hidden=false;toast('可以继续浏览，画布上会保留执行进度')};
